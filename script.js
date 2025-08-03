@@ -9,9 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     loadTasks();
 
     // Function to add a new task
-    function addTask() {
-        const taskText = taskInput.value.trim();
-
+    function addTask(taskText = taskInput.value.trim(), save = true) {
         if (taskText === "") {
             alert("Please enter a task.");
             return;
@@ -24,7 +22,6 @@ document.addEventListener('DOMContentLoaded', function () {
         removeBtn.textContent = 'Remove';
         removeBtn.classList.add('remove-btn');
 
-
         removeBtn.onclick = function () {
             li.remove();
             saveTasks();
@@ -33,22 +30,24 @@ document.addEventListener('DOMContentLoaded', function () {
         li.appendChild(removeBtn);
         taskList.appendChild(li);
 
-        taskInput.value = "";
+        if (save) {
+            saveTasks();
+        }
 
-        saveTasks();
+        taskInput.value = "";
     }
 
-    // Event listener for Add button
-    addButton.addEventListener('click', addTask);
+    // Add task on button click
+    addButton.addEventListener('click', () => addTask());
 
-    // Event listener for Enter key
+    // Add task on Enter key press
     taskInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
             addTask();
         }
     });
 
-    // Save tasks to localStorage
+    // Save all tasks to localStorage
     function saveTasks() {
         const tasks = [];
         document.querySelectorAll('#task-list li').forEach(function (li) {
@@ -60,21 +59,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Load tasks from localStorage
     function loadTasks() {
         const savedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-        savedTasks.forEach(function (taskText) {
-            const li = document.createElement('li');
-            li.textContent = taskText;
-
-            const removeBtn = document.createElement('button');
-            removeBtn.textContent = 'Remove';
-            removeBtn.className = 'remove-btn';
-
-            removeBtn.onclick = function () {
-                li.remove();
-                saveTasks();
-            };
-
-            li.appendChild(removeBtn);
-            taskList.appendChild(li);
-        });
+        savedTasks.forEach(taskText => addTask(taskText, false));
     }
 });
